@@ -1,0 +1,12 @@
+[book]
+title = "Web Asynchronous Programming in Rust with darpi"
+authors = ["Petar Dambovaliev"]
+
+[build]
+create-missing = false
+
+[output.html]
+
+[output.linkcheck]
+follow-web-links = true
+traverse-parent-directories = false
