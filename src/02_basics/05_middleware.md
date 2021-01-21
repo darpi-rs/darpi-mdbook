@@ -22,9 +22,9 @@ Middleware can also hook into response processing.
 - request
     - `#[request_parts] rp: &darpi::RequestParts`
       `serde::Deserialize`. `/user/{id}/article/{id}` will deserialize both ids into `MyStruct`.
-    - `#[body] body: &darpi::Body` if handler is not linked to a `GET` request
+    - `#[body] body: &mut darpi::Body` if handler is not linked to a `GET` request
 - response
-  - `#[response] r: darpi::Response<Body>`
+  - `#[response] r: &mut darpi::Response<Body>`
 - handler
     - `#[handler] arg: T` where the value must be provided when the middleware is invoked
 
@@ -33,7 +33,7 @@ Middleware can also hook into response processing.
 use darpi::{middleware, request::PayloadError, Body, HttpBody};
 
 #[middleware(Request)]
-pub async fn body_size_limit(#[body] b: &Body, #[handler] size: u64) -> Result<(), PayloadError> {
+async fn body_size_limit(#[body] b: &mut Body, #[handler] size: u64) -> Result<(), PayloadError> {
     if let Some(limit) = b.size_hint().upper() {
         if size < limit {
             return Err(PayloadError::Size(size, limit));
