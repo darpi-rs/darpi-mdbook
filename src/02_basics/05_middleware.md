@@ -3,7 +3,7 @@
 darpi’s middleware system allows us to add additional behavior to
 request/response processing. Middleware can hook into an incoming request
 process, enabling us to halt request processing to return a response early
-but it cannot modify the request.
+and modify the request body.
 Middleware can also hook into response processing.
 
 #### middleware types
