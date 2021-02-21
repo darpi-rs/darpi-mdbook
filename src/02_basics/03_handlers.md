@@ -49,10 +49,10 @@ pub struct Name {
     name: String,
 }
 
-// imagine body_size_limit is a middleware
-// function that returns Result<u64, Error>
 #[handler({
     middleware: {
+    // roundtrip returns Result<String, Error>
+    // later we can access it via #[middleware::request(0)]
         request: [roundtrip("blah")]
     }
 })]
