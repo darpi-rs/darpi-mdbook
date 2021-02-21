@@ -2,39 +2,42 @@
 
 The `app` macro generates code that link all the other components together. 
 
-```rust,ignore
+```rust
 #[tokio::main]
 async fn main() -> Result<(), darpi::Error> {
     let address = format!("127.0.0.1:{}", 3000);
     app!({
-        // if this the address is a literal
-        // it will be checked, if it is a valid address at compiled time
-        // in this case, it is a variable so that is impossible
         address: address,
-        // here we set the function that builds the shaku container
-        module: make_container => Container,
-        // a set of global middleware that will be executed for every handler
-        // middleware is executed in the order defined by the user
-        middleware: [body_size_limit(128)],
-        bind: [
+        container: {
+            factory: make_container(),
+            type: Container
+        },
+        middleware: {
+            request: [body_size_limit(128), decompress()],
+            response: []
+        },
+        jobs: {
+            request: [],
+            response: [first_sync_job, first_sync_job1, first_sync_io_job]
+        },
+        handlers: [
             {
-                route: "/login",
-                method: Method::POST,
-                // the POST method allows this handler to have
-                // to have access to a request body
-                handler: login
-            },
-            {
-                route: "/hello_world/{name}",
+                route: "/",
                 method: Method::GET,
-                // GET request handlers are not allowed
-                // to have request body as an argument
-                // it is a compile time error
-                handler: do_something
+                handler: home
             },
-        ],
+        ]
     })
     .run()
     .await
 }
 ```
+
+Lets break it down.
+
+`address` can be either a `String` or a `&'static str`
+
+`container` has a `factory` function, which is used to create a `shaku` container
+and a `type` (supports arguments too), which is the return type of the `factory`.
+
+`middleware`, `jobs` and `handlers` we will tackle in the next chapters.

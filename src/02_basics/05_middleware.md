@@ -17,19 +17,28 @@ Middleware can also hook into response processing.
 
 
 ### possible arguments
-- shaku container
+- Request middleware
+  - shaku container
+      - `#[inject] my_arg: Arc<dyn SomeTrait>`
+  - request
+      - `#[request_parts] rp: &darpi::RequestParts`
+        `serde::Deserialize`. `/user/{id}/article/{id}` will deserialize both ids into `MyStruct`.
+      - `#[body] body: &mut darpi::Body` if handler is not linked to a `GET` request
+  
+
+- Response middleware
+  - shaku container
     - `#[inject] my_arg: Arc<dyn SomeTrait>`
-- request
-    - `#[request_parts] rp: &darpi::RequestParts`
-      `serde::Deserialize`. `/user/{id}/article/{id}` will deserialize both ids into `MyStruct`.
-    - `#[body] body: &mut darpi::Body` if handler is not linked to a `GET` request
-- response
-  - `#[response] r: &mut darpi::Response<Body>`
-- handler
+  - response
+     - `#[response] r: &mut darpi::Response<Body>`
+  - handler
     - `#[handler] arg: T` where the value must be provided when the middleware is invoked
 
+
+While i recommend using the macros. If you really want to, you could implement the middleware request and response traits.
+
     
-```rust,ignore
+```rust
 use darpi::{middleware, request::PayloadError, Body, HttpBody};
 
 #[middleware(Request)]
@@ -45,7 +54,7 @@ async fn body_size_limit(#[body] b: &mut Body, #[handler] size: u64) -> Result<(
 
 a more complicated example
 
-```rust, ignore
+```rust
 #[middleware(Request)]
 pub async fn authorize(
     #[handler] role: impl UserRole,
@@ -53,22 +62,22 @@ pub async fn authorize(
     #[inject] algo_provider: Arc<dyn JwtAlgorithmProvider>,
     #[inject] token_ext: Arc<dyn TokenExtractor>,
     #[inject] secret_provider: Arc<dyn JwtSecretProvider>,
-) -> Result<Token, Error> {
+) -> Result<Claims, Error> {
     let token_res = token_ext.extract(&rp).await;
     match token_res {
         Ok(jwt) => {
             let decoded = decode::<Claims>(
                 &jwt,
-                &DecodingKey::from_secret(secret_provider.secret().await.as_ref()),
+                secret_provider.decoding_key().await,
                 &Validation::new(algo_provider.algorithm().await),
             )
             .map_err(|_| Error::JWTTokenError)?;
 
-            if !role.is_authorized(&decoded.claims.role) {
+            if !role.is_authorized(&decoded.claims) {
                 return Err(Error::NoPermissionError);
             }
 
-            Ok(decoded.claims.sub)
+            Ok(decoded.claims)
         }
         Err(e) => return Err(e),
     }

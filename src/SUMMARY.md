@@ -9,3 +9,4 @@
   - [Handlers](02_basics/03_handlers.md)
   - [Errors](02_basics/04_errors.md)
   - [Middleware](02_basics/05_middleware.md)
+  - [Jobs](02_basics/06_jobs.md)
