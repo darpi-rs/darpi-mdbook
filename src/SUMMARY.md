@@ -10,3 +10,4 @@
   - [Errors](02_basics/04_errors.md)
   - [Middleware](02_basics/05_middleware.md)
   - [Jobs](02_basics/06_jobs.md)
+  - [Web sockets](02_basics/07_web_sockets.md)

@@ -20,52 +20,55 @@ This is necessary to have an optimal way of using our resources.
 While i recommend using the macros. If you really want to, you could implement the Job factory request and response traits.
 
 ```rust 
-pub enum Job {
-    Future(Pin<Box<dyn Future<Output = ()> + Send>>),
-    CpuBound(Box<dyn Fn() + Send>),
-    IOBlocking(Box<dyn Fn() + Send>),
+pub enum Job<T = ()> {
+    Future(FutureJob<T>),
+    CpuBound(CpuJob<T>),
+    IOBlocking(IOBlockingJob<T>),
 }
+
+pub struct FutureJob<T = ()>(Pin<Box<dyn Future<Output = T> + Send>>);
+pub struct CpuJob<T = ()>(Box<dyn FnOnce() -> T + Send>);
+pub struct IOBlockingJob<T = ()>(Box<dyn FnOnce() -> T + Send>);
+
 ```
 
 Few short examples.
     
 ```rust
-use darpi::{job_factory, job::Job};
-
 #[job_factory(Request)]
-async fn first_async_job() -> Job {
-  Job::Future(async { println!("first job in the background.") }.boxed())
+async fn first_async_job() -> FutureJob {
+  async { println!("first job in the background.") }.into()
 }
 ```
 
 // blocking here is ok!
 ```rust
-use darpi::{job_factory, job::Job, Response, Body};
-
 #[job_factory(Response)]
-async fn first_sync_job(#[response] r: &Response<Body>) -> Job {
+async fn first_sync_job(#[response] r: &Response<Body>) -> IOBlockingJob {
   let status_code = r.status();
-  Job::IOBlocking(Box::new(move || {
+  let job = move || {
     std::thread::sleep(std::time::Duration::from_secs(2));
     println!(
       "first_sync_job in the background for a request with status {}",
       status_code
     );
-  }))
+  };
+  job.into()
 }
 ```
 
 ```rust
-use darpi::{job_factory, job::Job};
-
 #[job_factory(Response)]
-async fn first_sync_job1() -> Job {
-  Job::CpuBound(Box::new(|| {
-    let mut r = 0;
-    for _ in 0..10000000 {
-      r += 1;
+async fn my_heavy_computation() -> CpuJob {
+  let job = || {
+    for _ in 0..100 {
+      let mut r = 0;
+      for _ in 0..10000000 {
+        r += 1;
+      }
+      println!("my_heavy_computation runs in the background. {}", r);
     }
-    println!("first_sync_job1 finished in the background. {}", r)
-  }))
+  };
+  job.into()
 }
 ```

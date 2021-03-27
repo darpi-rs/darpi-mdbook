@@ -23,9 +23,10 @@ The return type must `impl darpi::response::Responder`. For convenience, it is i
 
 ##possible arguments
 
-- shaku container
+- dependency injection container
   - `#[inject] my_arg: Arc<dyn SomeTrait>`
-- request    
+- request
+  - `#[request] r: darpi::Request<darpi::Body>` consumes the entire request therefore prevents other attributes from being used except `#[path]` 
   - `#[request_parts] rp: &darpi::RequestParts`
   - `#[query] q: MyStruct` where `MyStruct` has to implement
     `serde::Deserialize`. Furthermore, if wrapped in an `Option` it is not mandatory.
@@ -51,12 +52,13 @@ pub struct Name {
 
 #[handler({
     middleware: {
-    // roundtrip returns Result<String, Error>
-    // later we can access it via #[middleware::request(0)]
+        // roundtrip returns Result<String, Error>
+        // later we can access it via #[middleware::request(0)]
         request: [roundtrip("blah")]
     }
 })]
-async fn do_something123(
+async fn do_something(
+  #[request_parts] _rp: &RequestParts,
   // the request query is deserialized into Name
   // if deseriliazation fails, it will result in an error response
   // to make it optional wrap it in an Option<Name>
@@ -74,8 +76,8 @@ async fn do_something123(
   // the Responder trait for common types
 ) -> String {
   format!(
-    "query: {} path: {} body: {} middleware: {}",
-    query.name, path.name, payload.name, m_str
+    "query: {:#?} path: {} body: {} middleware: {}",
+    query, path.name, payload.name, m_str
   )
 }
 
