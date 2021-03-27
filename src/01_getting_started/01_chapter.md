@@ -8,6 +8,6 @@ If you're looking to start writing simple, productive, safe and fast web backend
 This book aims to be a comprehensive, up-to-date guide to using the web
 framework `darpi` and the crates associated with it, appropriate for beginners and old hands alike.
 
-## A [demo app](https://github.com/petar-dambovaliev/example-heroku-darpi) to check out 
+## A [demo app](https://github.com/darpi-rs/example-heroku-darpi) to check out
 
 Let's go ahead!
