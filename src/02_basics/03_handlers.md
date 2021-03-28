@@ -21,7 +21,7 @@ The arguments can be provided in several ways, by macro attributes.
 Handlers bound by a `GET` method do not have access to a request body.
 The return type must `impl darpi::response::Responder`. For convenience, it is implemented for all common types.
 
-##possible arguments
+## possible arguments
 
 - dependency injection container
   - `#[inject] my_arg: Arc<dyn SomeTrait>`
