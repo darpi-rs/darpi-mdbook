@@ -80,5 +80,25 @@ async fn do_something(
     query, path.name, payload.name, m_str
   )
 }
+```
 
+An example returning a Response object.
+For more information visit
+
+[response](https://docs.rs/http/0.2.3/http/response/struct.Response.html)
+
+[status codes](https://docs.rs/http/0.2.3/http/status/struct.StatusCode.html#associatedconstant.SEE_OTHER)
+
+[body](https://docs.rs/hyper/0.14.5/hyper/struct.Body.html)
+
+```rust
+use darpi::{handler, Body, Response, StatusCode};
+
+#[handler]
+async fn my_handler() -> Response<Body> {
+    Response::builder()
+        .status(StatusCode::OK)
+        .body(Default::default())
+        .unwrap()
+}
 ```
