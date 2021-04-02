@@ -4,7 +4,7 @@
   - [Why Darpi?](01_getting_started/02_why_darpi.md)
   - [The State of Web Frameworks](01_getting_started/03_state_of_web_frameworks.md)
 
-- [Application](02_basics/01_chapter.md)
+- [Basics](02_basics/01_chapter.md)
   - [App](02_basics/02_app.md)
   - [Handlers](02_basics/03_handlers.md)
   - [Errors](02_basics/04_errors.md)

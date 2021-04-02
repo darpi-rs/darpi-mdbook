@@ -31,7 +31,7 @@ The return type must `impl darpi::response::Responder`. For convenience, it is i
   - `#[query] q: MyStruct` where `MyStruct` has to implement
     `serde::Deserialize`. Furthermore, if wrapped in an `Option` it is not mandatory.
   - `#[path] path: MyStruct` where `MyStruct` has to implement
-    `serde::Deserialize`. `/user/{id}/article/{id}` will deserialize both ids into `MyStruct`.
+    `serde::Deserialize`. `/user/{user_id}/article/{article_id}` will deserialize both ids into `MyStruct`.
   - `#[body] data: impl FromRequestBody<T: serde:Deserialize>` if handler is not linked to a `GET` request
 - middleware
   - `#[middleware::request(i) my_arg: T]` where `i` is a literal index of the middleware linked to the handler

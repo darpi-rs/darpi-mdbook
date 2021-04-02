@@ -30,7 +30,9 @@ pub struct Login {
     password: String,
 }
 
-#[handler(Container)]
+#[handler({
+    container: Container
+})]
 async fn login(
     #[body] data: Json<Login>,
     #[inject] jwt_tok_creator: Arc<dyn JwtTokenCreator>,
